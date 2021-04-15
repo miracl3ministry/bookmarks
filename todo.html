@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Заметки</title>
+    <style>
+        #content {
+            margin: auto;
+            width: 800px;
+            height: 600px;
+            font-family: Arial, monospace;
+            font-size: 26px;
+        }
+
+        #content:focus {
+            outline: -webkit-focus-ring-color 3px;
+        }
+
+        .main {
+            text-align: center;
+            font-family: Arial, monospace;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <h1>Заметки</h1>
+    <textarea id="content" cols="30" rows="10"></textarea>
+</div>
+<script>
+    "use strict"
+    document.onclose = save
+    let content = document.querySelector("#content")
+    content.value = localStorage.getItem("key")
+    content.addEventListener("input", save)
+
+    function save() {
+        localStorage.setItem("key", content.value)
+    }
+
+</script>
+</body>
+</html>
