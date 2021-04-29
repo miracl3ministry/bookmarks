@@ -1,0 +1,24 @@
+#content {
+    margin: auto;
+    width: 800px;
+    height: 600px;
+    font-family: Arial, monospace;
+    font-size: 26px;
+}
+
+#content:focus {
+    outline: -webkit-focus-ring-color 3px;
+}
+
+.main {
+    text-align: center;
+    font-family: Arial, monospace;
+}
+.tabs {
+    display: flex;
+    width: 808px;
+    margin: auto;
+}
+button {
+    font-size: 20px;
+}

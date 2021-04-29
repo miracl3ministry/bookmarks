@@ -1,43 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Заметки</title>
-    <style>
-        #content {
-            margin: auto;
-            width: 800px;
-            height: 600px;
-            font-family: Arial, monospace;
-            font-size: 26px;
-        }
+    <head>
+        <meta charset="UTF-8" />
+        <title>Заметки</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="main">
+            <h1>Заметки</h1>
+            <div class="tabs"></div>
+            <textarea id="content" cols="30" rows="10"></textarea>
+        </div>
+        <script>
+            "use strict";
+            const tabs = {
+                tabNavElement: document.querySelector(".tabs"),
+                activeTab: null,
+                getItemsFromStorage() {
+                    this.tabItems = [];
+                    for (const key in obj) {
+                        this.tabItems.push(key);
+                    }
+                },
+                displayItemsInNav() {
+                    this.getItemsFromStorage();
+                    this.tabNavElement.innerHTML = "";
+                    this.tabItems.forEach((e) => {
+                        let btn = document.createElement("button");
+                        btn.innerHTML = e;
+                        btn.onclick = () => {
+                            content.value = obj[e];
+                            this.activeTab = e;
+                        };
+                        this.tabNavElement.appendChild(btn);
+                    });
+                    this.addPlusBtn();
+                    this.addDeleteBtn();
+                    this.tabNavElement.firstElementChild.click();
+                },
+                displayItemsInNavToDeleteMod() {
+                    this.getItemsFromStorage();
+                    this.tabNavElement.innerHTML = "";
+                    this.tabItems.forEach((e) => {
+                        let btn = document.createElement("button");
+                        btn.innerHTML = e;
+                        btn.style.backgroundColor = "#fcc";
+                        btn.onclick = (e) => {
+                            if (confirm("Вы действительно хотите удалить " + e.target.innerHTML)) {
+                                content.value = "";
+                                this.activeTab = null;
+                                delete obj[e.target.innerHTML];
+                            }
+                            this.displayItemsInNav();
+                            save();
+                        };
+                        this.tabNavElement.appendChild(btn);
+                    });
+                    this.addPlusBtn();
+                    this.addDeleteBtn();
+                },
+                addPlusBtn() {
+                    let plus = document.createElement("button");
+                    plus.innerHTML = "+";
+                    plus.addEventListener("click", () => {
+                        let name = prompt("Название вкладки");
+                        if (name) {
+                            obj[name] = "";
+                            this.activeTab = name;
+                            this.displayItemsInNav();
+                            save();
+                        }
+                    });
+                    this.tabNavElement.appendChild(plus);
+                },
+                addDeleteBtn() {
+                    let deleteBtn = document.createElement("button");
+                    deleteBtn.innerHTML = "-";
+                    deleteBtn.style.backgroundColor = "#fcc";
+                    deleteBtn.addEventListener("click", () => {
+                        this.displayItemsInNavToDeleteMod();
+                    });
+                    this.tabNavElement.appendChild(deleteBtn);
+                },
+                init() {
+                    this.displayItemsInNav();
+                },
+            };
 
-        #content:focus {
-            outline: -webkit-focus-ring-color 3px;
-        }
+            let content = document.querySelector("#content");
+            let obj = JSON.parse(localStorage.getItem("bookmarks")) ?? {};
 
-        .main {
-            text-align: center;
-            font-family: Arial, monospace;
-        }
-    </style>
-</head>
-<body>
-<div class="main">
-    <h1>Заметки</h1>
-    <textarea id="content" cols="30" rows="10"></textarea>
-</div>
-<script>
-    "use strict"
-    document.onclose = save
-    let content = document.querySelector("#content")
-    content.value = localStorage.getItem("key")
-    content.addEventListener("input", save)
+            tabs.init();
 
-    function save() {
-        localStorage.setItem("key", content.value)
-    }
-
-</script>
-</body>
+            content.addEventListener("input", save);
+            document.onclose = save();
+            function save() {
+                obj[tabs.activeTab] = content.value;
+                localStorage.setItem("bookmarks", JSON.stringify(obj));
+            }
+        </script>
+    </body>
 </html>
