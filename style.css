@@ -18,6 +18,7 @@
     display: flex;
     width: 808px;
     margin: auto;
+    flex-wrap: wrap;
 }
 button {
     font-size: 20px;
