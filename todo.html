@@ -6,20 +6,74 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <div class="main">
-            <h1>Заметки</h1>
-            <div class="tabs"></div>
-            <textarea id="content" cols="30" rows="10"></textarea>
+        <div class="nav">
+            <a href="#" id="main-link">Заметки</a>
+            <a href="#" id="matrix-link">Матрица Эйзенхауэра</a>
+        </div>
+        <div class="content">
+            <div class="main">
+                <h1>Заметки</h1>
+                <div class="tabs"></div>
+                <textarea id="content" cols="30" rows="10"></textarea>
+            </div>
+            <div class="matrix hidden">
+                <h1>Матрица Эйзенхауэра</h1>
+                <div class="matrix-content">
+                    <div class="col3">
+                        <p class="col-name"></p>
+                        <p class="col-name">Срочное</p>
+                        <p class="col-name">Не срочное</p>
+                    </div>
+                    <div class="col3">
+                        <p class="row-name">Важное</p>
+                        <p class="k1" contenteditable=""></p>
+                        <p class="k2" contenteditable=""></p>
+                    </div>
+                    <div class="col3">
+                        <p class="row-name">Не важное</p>
+                        <p class="k3" contenteditable=""></p>
+                        <p class="k4" contenteditable=""></p>
+                    </div>
+                </div>
+                <img src="./8258728fe04029.png" alt="" />
+            </div>
         </div>
         <script>
             "use strict";
+            document.getElementById("main-link").addEventListener("click", () => {
+                document.querySelector(".matrix").classList.add("hidden");
+                document.querySelector(".main").classList.remove("hidden");
+            });
+            document.getElementById("matrix-link").addEventListener("click", () => {
+                document.querySelector(".main").classList.add("hidden");
+                document.querySelector(".matrix").classList.remove("hidden");
+                matrix.start();
+            });
+            const matrix = {
+                start() {
+                    document.querySelector(".k1").innerText = obj["_matrix"]["k1"];
+                    document.querySelector(".k2").innerText = obj["_matrix"]["k2"];
+                    document.querySelector(".k3").innerText = obj["_matrix"]["k3"];
+                    document.querySelector(".k4").innerText = obj["_matrix"]["k4"];
+                },
+                save() {
+                    if (!obj["_matrix"]) obj["_matrix"] = {};
+                    obj["_matrix"]["k1"] = document.querySelector(".k1").innerText;
+                    obj["_matrix"]["k2"] = document.querySelector(".k2").innerText;
+                    obj["_matrix"]["k3"] = document.querySelector(".k3").innerText;
+                    obj["_matrix"]["k4"] = document.querySelector(".k4").innerText;
+                    save();
+                },
+            };
             const tabs = {
                 tabNavElement: document.querySelector(".tabs"),
                 activeTab: null,
                 getItemsFromStorage() {
                     this.tabItems = [];
                     for (const key in obj) {
-                        this.tabItems.push(key);
+                        if (key[0] !== "_") {
+                            this.tabItems.push(key);
+                        }
                     }
                 },
                 displayItemsInNav() {
@@ -64,7 +118,7 @@
                     plus.innerHTML = "+";
                     plus.addEventListener("click", () => {
                         let name = prompt("Название вкладки");
-                        if (name) {
+                        if (name && name[0] !== "_") {
                             obj[name] = "";
                             this.activeTab = name;
                             this.displayItemsInNav();
@@ -88,23 +142,27 @@
             };
 
             let content = document.querySelector("#content");
-            let obj = JSON.parse(localStorage.getItem("bookmarks")) ?? {};
-            content.addEventListener('keydown', function(e) {
-                if (e.key == 'Tab') {
+            content.addEventListener("keydown", function (e) {
+                if (e.key == "Tab") {
                     e.preventDefault();
                     var start = this.selectionStart;
                     var end = this.selectionEnd;
 
                     // set textarea value to: text before caret + tab + text after caret
-                    this.value = this.value.substring(0, start) +
-                    "\t" + this.value.substring(end);
+                    this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
 
                     // put caret at right position again
-                    this.selectionStart =
-                    this.selectionEnd = start + 1;
+                    this.selectionStart = this.selectionEnd = start + 1;
                 }
             });
+
+            let obj = JSON.parse(localStorage.getItem("bookmarks")) ?? {};
             tabs.init();
+
+            document.querySelector(".k1").addEventListener("input", matrix.save);
+            document.querySelector(".k2").addEventListener("input", matrix.save);
+            document.querySelector(".k3").addEventListener("input", matrix.save);
+            document.querySelector(".k4").addEventListener("input", matrix.save);
 
             content.addEventListener("input", save);
             document.onclose = save();
